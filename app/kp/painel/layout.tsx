@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { APPS } from "@/lib/kp/apps";
 
 export const metadata = { title: "Kairós | Painel", robots: { index: false, follow: false } };
 
@@ -15,7 +16,7 @@ export default function PainelLayout({ children }: { children: ReactNode }) {
         .kp-app input,.kp-app select{background:#fff;color:#16283c}
         .kp-app h1,.kp-app h2,.kp-app h3{color:#16283c}
       `}</style>
-      <header className="kp-hd"><b>KAIRÓS</b><span>Gestão e Liderança</span><nav style={{ marginTop: 8, fontSize: 14 }}><a href="/kp/painel">Pesquisas</a> {" | "} <a href="/kp/painel/vagas">Recrutamento</a> {" | "} <a href="/kp/painel/talentos">Banco de talentos</a></nav></header>
+      <header className="kp-hd"><b>KAIRÓS</b><span>Gestão e Liderança</span><nav style={{ marginTop: 8, fontSize: 14 }}><a href="/kp/painel/apps">Início</a>{APPS.filter((a) => a.pronto).map((a) => (<span key={a.id}> {" | "} <a href={a.href}>{a.menu}</a></span>))}</nav></header>
       <div className="kp-app">{children}</div>
     </div>
   );
