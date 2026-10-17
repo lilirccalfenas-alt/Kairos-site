@@ -69,7 +69,7 @@ export const contact = { city: 'Alfenas, MG' }
 export const formattedWhatsappNumber = '(35) 99867-8862'
 export const whatsappTelephone = '+55 35 99867-8862'
 export const whatsappLink = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent('Olá! Gostaria de conhecer a Kairós Gestão e Liderança.')}`
-export const navItems = [['Início', '#inicio'], ['Quem somos', '#quem-somos'], ['Soluções', '#solucoes'], ['Cursos', '/cursos'], ['Planos', '#planos'], ['Contato', '#contato']] as const
+export const navItems = [['Início', '#inicio'], ['Quem somos', '#quem-somos'], ['Soluções', '#solucoes'], ['Treinamentos', '/treinamentos'], ['Planos', '#planos'], ['Contato', '#contato']] as const
 export const footerLinks = [['Política de Privacidade', '/privacidade'], ['Termos de Uso', '/termos'], ['Área do Cliente', '/area-do-cliente']] as const
 export const displayCurrency = (value: number) => value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 export const metadataDescription = 'Kairós Gestão e Liderança: gestão de pessoas, líderes e tecnologia para pequenas empresas em Alfenas, Sul de Minas e todo o Brasil.'
