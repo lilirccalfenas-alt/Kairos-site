@@ -1,10 +1,13 @@
 import { NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
+import { requireResearchUser } from '@/lib/research-auth'
 import { dimensoes, totalItens } from '@/lib/pesquisa-data'
 
 type Params = { params: Promise<{ id: string }> }
 
 export async function GET(request: Request, { params }: Params) {
+  const access = await requireResearchUser(request)
+  if (access.response) return access.response
   const { id } = await params
   const supabase = getSupabaseAdmin()
   const { data: session, error: sessionError } = await supabase.from('sessoes').select('id, empresa, grupo, criado_em').eq('id', id).maybeSingle()

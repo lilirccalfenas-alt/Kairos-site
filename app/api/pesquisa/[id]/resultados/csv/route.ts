@@ -1,11 +1,14 @@
 import { NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
+import { requireResearchUser } from '@/lib/research-auth'
 import { dimensoes } from '@/lib/pesquisa-data'
 
 type Params = { params: Promise<{ id: string }> }
 const csv = (value: unknown) => `"${String(value ?? '').replaceAll('"', '""')}"`
 
-export async function GET(_request: Request, { params }: Params) {
+export async function GET(request: Request, { params }: Params) {
+  const access = await requireResearchUser(request)
+  if (access.response) return access.response
   const { id } = await params
   const supabase = getSupabaseAdmin()
   const { data: session } = await supabase.from('sessoes').select('empresa, grupo').eq('id', id).maybeSingle()
