@@ -1,7 +1,23 @@
 import { NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
+import { requireResearchUser } from '@/lib/research-auth'
+
+export async function GET(request: Request) {
+  const access = await requireResearchUser(request)
+  if (access.response) return access.response
+  const supabase = getSupabaseAdmin()
+  const { data, error } = await supabase.from('sessoes').select('id, empresa, grupo, criado_em, aberta').order('criado_em', { ascending: false })
+  if (error) return NextResponse.json({ error: 'Não foi possível carregar as pesquisas.' }, { status: 500 })
+  const sessions = await Promise.all((data ?? []).map(async (session) => {
+    const { count } = await supabase.from('respostas').select('id', { count: 'exact', head: true }).eq('sessao_id', session.id)
+    return { ...session, respostas: count ?? 0 }
+  }))
+  return NextResponse.json({ sessions })
+}
 
 export async function POST(request: Request) {
+  const access = await requireResearchUser(request)
+  if (access.response) return access.response
   try {
     const body = await request.json()
     const empresa = typeof body.empresa === 'string' ? body.empresa.trim().slice(0, 120) : ''
