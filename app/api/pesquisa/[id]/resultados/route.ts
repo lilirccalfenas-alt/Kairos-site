@@ -7,6 +7,9 @@ type Params = { params: Promise<{ id: string }> }
 type Answer = { sessao_id: string; respostas: Record<string, unknown>; comentario: string | null; criado_em: string }
 type Session = { id: string; empresa: string; grupo: string | null; criado_em: string }
 const normalize = (value: string | null | undefined) => (value ?? '').trim().toLocaleLowerCase('pt-BR')
+const INVERTED_QUESTIONS = new Set(['0-0', '0-1', '2-1', '4-1', '6-1', '7-0', '8-0', '9-0'])
+const RISK_THRESHOLDS = { low: 4, attention: 3 }
+const invertedValue = (value: number, key: string) => INVERTED_QUESTIONS.has(key) ? 6 - value : value
 
 export async function GET(request: Request, { params }: Params) {
   const access = await requireResearchUser(request)
@@ -44,7 +47,7 @@ export async function GET(request: Request, { params }: Params) {
     const values = source.map((answer) => {
       const raw = answer.respostas?.[item.key]
       const value = typeof raw === 'number' ? raw : typeof raw === 'string' ? Number(raw.trim().replace(',', '.')) : Number(raw)
-      return Number.isFinite(value) ? value : null
+      return Number.isFinite(value) ? invertedValue(value, item.key) : null
     }).filter((value): value is number => value !== null)
     return { dimension: item.dimension, question: item.question, average: values.length ? Number((values.reduce((sum, value) => sum + value, 0) / values.length).toFixed(2)) : 0 }
   })
