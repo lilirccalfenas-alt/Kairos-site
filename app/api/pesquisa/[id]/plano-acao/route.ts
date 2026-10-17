@@ -28,6 +28,17 @@ export async function POST(request: Request, { params }: Params) {
   return NextResponse.json({ plan: data })
 }
 
+export async function DELETE(request: Request, { params }: Params) {
+  const access = await requireResearchUser(request)
+  if (access.response) return access.response
+  const { id } = await params
+  const planId = new URL(request.url).searchParams.get('id')
+  if (!planId) return NextResponse.json({ error: 'Plano inválido.' }, { status: 400 })
+  const { error } = await getSupabaseAdmin().from('planos_acao').delete().eq('id', planId).eq('sessao_id', id)
+  if (error) return NextResponse.json({ error: 'Não foi possível excluir o plano.' }, { status: 500 })
+  return NextResponse.json({ ok: true })
+}
+
 export async function PATCH(request: Request, { params }: Params) {
   const access = await requireResearchUser(request)
   if (access.response) return access.response
