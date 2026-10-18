@@ -6,13 +6,15 @@ import { isAdmin } from "@/lib/kp/auth";
 // Resumo de TODOS os apps para a página inicial da consultora.
 export async function GET() {
   if (!isAdmin((await cookies()).get("kp_admin")?.value)) return NextResponse.json({ erro: "nao autorizado" }, { status: 401 });
-  const [ss, vs, rs, cs, tal, novos] = await Promise.all([
+  const [ss, vs, rs, cs, tal, novos, curriculos, anunciosPendentes] = await Promise.all([
     db.from("kp_sessoes").select("id,empresa,grupo,tipo,aberta,criado_em,kp_respostas(count)").order("criado_em", { ascending: false }).limit(50),
     db.from("kp_vagas").select("id,titulo,empresa,aberta,criado_em,kp_candidatos(count)").order("criado_em", { ascending: false }).limit(50),
     db.from("kp_respostas").select("sessao_id,criado_em").order("criado_em", { ascending: false }).limit(10),
     db.from("kp_candidatos").select("id,nome,vaga_id,criado_em").order("criado_em", { ascending: false }).limit(10),
     db.from("kp_candidatos").select("id", { count: "exact", head: true }).eq("banco_talentos", true),
     db.from("kp_candidatos").select("id", { count: "exact", head: true }).eq("status", "novo"),
+    db.from("kp_curriculos").select("id", { count: "exact", head: true }),
+    db.from("kp_vagas").select("id", { count: "exact", head: true }).eq("status", "pendente"),
   ]);
   const sessoes = (ss.data ?? []).map((s: any) => ({ ...s, n: s.kp_respostas?.[0]?.count ?? 0 }));
   const vagas = (vs.data ?? []).map((v: any) => ({ ...v, n: v.kp_candidatos?.[0]?.count ?? 0 }));
@@ -30,6 +32,8 @@ export async function GET() {
       candidatos: vagas.reduce((a: number, v: any) => a + v.n, 0),
       candidatosNovos: novos.count ?? 0,
       talentos: tal.count ?? 0,
+      curriculos: curriculos.count ?? 0,
+      anunciosPendentes: anunciosPendentes.count ?? 0,
     },
     sessoes, vagas, atividades,
   });

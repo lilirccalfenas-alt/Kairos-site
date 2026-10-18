@@ -1,0 +1,5 @@
+import { cookies } from 'next/headers'
+import { NextResponse } from 'next/server'
+import { db } from '@/lib/kp/db'; import { isAdmin } from '@/lib/kp/auth'
+export async function GET(req:Request){if(!isAdmin((await cookies()).get('kp_admin')?.value))return NextResponse.json({error:'Não autorizado'},{status:401});const u=new URL(req.url);let q=db.from('kp_curriculos').select('id,nome,email,telefone,cidade,area,escolaridade,resumo,arquivo_path,arquivo_nome,created_at').order('created_at',{ascending:false});if(u.searchParams.get('area'))q=q.eq('area',u.searchParams.get('area'));if(u.searchParams.get('cidade'))q=q.eq('cidade',u.searchParams.get('cidade'));const {data,error}=await q;return NextResponse.json({data,error})}
+export async function DELETE(req:Request){if(!isAdmin((await cookies()).get('kp_admin')?.value))return NextResponse.json({error:'Não autorizado'},{status:401});const {id,path}=await req.json();if(path)await db.storage.from('curriculos').remove([path]);const {error}=await db.from('kp_curriculos').delete().eq('id',id);return NextResponse.json({ok:!error})}
