@@ -1,0 +1,3 @@
+import { NextResponse } from 'next/server'
+import { db } from '@/lib/kp/db'
+export async function POST(req:Request){const b=await req.json();if(b.website||!b.termos)return NextResponse.json({ok:true});const {error}=await db.from('kp_vagas').insert({titulo:b.cargo,empresa:b.empresa||null,descricao:b.descricao,requisitos:b.requisitos,cidade:b.cidade,contratacao:b.contratacao,origem:'empresa',status:'pendente',publica:false,pesos:{},contato:{cnpj:b.cnpj||'',responsavel:b.responsavel,email:b.email,telefone:b.telefone,faixa:b.faixa||''}});if(error)return NextResponse.json({error:'Falha ao enviar'},{status:500});return NextResponse.json({ok:true})}

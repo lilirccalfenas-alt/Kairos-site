@@ -21,7 +21,7 @@ export default function Central() {
   }
   if (ok === null) return null;
   const K = d?.kpis;
-  const cards: [string, number][] = K ? [["Pesquisas abertas", K.pesquisasAbertas], ["Respostas de clima", K.respostas], ["Vagas abertas", K.vagasAbertas], ["Candidatos", K.candidatos], ["Candidatos novos", K.candidatosNovos], ["Banco de talentos", K.talentos]] : [];
+  const cards: [string, number][] = K ? [["Pesquisas abertas", K.pesquisasAbertas], ["Respostas de clima", K.respostas], ["Vagas abertas", K.vagasAbertas], ["Candidatos", K.candidatos], ["Candidatos novos", K.candidatosNovos], ["Banco de talentos", K.talentos], ["Currículos", K.curriculos ?? 0], ["Anúncios pendentes", K.anunciosPendentes ?? 0]] : [];
   return (
     <main style={{ maxWidth: 900, margin: "0 auto", padding: 16, fontFamily: "system-ui", color: "#16283c" }}>
       <h1>Visão geral</h1>
