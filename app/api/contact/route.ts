@@ -36,7 +36,10 @@ export async function POST(request: Request) {
 
   const { error: databaseError } = await db.from('site_contatos').insert({ nome, empresa: empresa || null, email, telefone: telefone || null, numero_colaboradores: numeroColaboradores || null, servico_interesse: servicoInteresse || null, mensagem: mensagem || null, plano_escolhido: planoEscolhido || null, consentimento: true })
   if (databaseError) { console.error('[contact] Supabase insert failed', databaseError); return Response.json({ error: 'Não foi possível enviar sua mensagem agora.' }, { status: 500 }) }
-  if (!resend || !process.env.CONTACT_EMAIL_TO) { console.error('[contact] Resend is not configured'); return Response.json({ error: 'Não foi possível enviar sua mensagem agora.' }, { status: 500 }) }
+  if (!resend || !process.env.CONTACT_EMAIL_TO) {
+    console.error('[contact] Resend is not configured; contact saved to Supabase', { hasResendApiKey: Boolean(process.env.RESEND_API_KEY), hasContactEmailTo: Boolean(process.env.CONTACT_EMAIL_TO) })
+    return Response.json({ ok: true, emailSent: false })
+  }
 
   const receivedAt = new Intl.DateTimeFormat('pt-BR', { dateStyle: 'full', timeStyle: 'short', timeZone: 'America/Sao_Paulo' }).format(new Date())
   const content = [`Nome: ${nome}`, `Empresa: ${empresa || 'Não informada'}`, `E-mail: ${email}`, `Telefone: ${telefone || 'Não informado'}`, `Colaboradores: ${numeroColaboradores || 'Não informado'}`, `Serviço de interesse: ${servicoInteresse || 'Não informado'}`, `Plano escolhido: ${planoEscolhido || 'Não informado'}`, `Mensagem: ${mensagem || 'Não informada'}`, `Recebido em: ${receivedAt}`].join('\n')
