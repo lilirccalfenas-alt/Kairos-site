@@ -1,6 +1,7 @@
 import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
 import './globals.css'
+import './client-portal.css'
 import { companyName, metadataDescription } from '@/lib/site-data'
 
 export const metadata: Metadata = {
