@@ -1,0 +1,6 @@
+'use client'
+import { FormEvent, useState } from 'react'
+import Link from 'next/link'
+import { createClient } from '@/lib/supabase/browser'
+
+export default function NewPasswordPage(){const [password,setPassword]=useState('');const [message,setMessage]=useState('');const [error,setError]=useState('');async function submit(e:FormEvent){e.preventDefault();setError('');const {error}=await createClient().auth.updateUser({password});if(error)setError('Não foi possível atualizar a senha. Solicite um novo link.');else setMessage('Senha atualizada. Você já pode entrar.')}return <main className="portal-login"><div className="portal-login-card"><Link href="/area-do-cliente/login" className="portal-back">← Voltar ao login</Link><div className="portal-mark"><span>k</span><div><strong>Kairós</strong><small>Gestão e Liderança</small></div></div><span className="portal-eyebrow">Nova senha</span><h1>Crie uma nova senha</h1><form onSubmit={submit}><label>Nova senha<input type="password" minLength={8} required value={password} onChange={e=>setPassword(e.target.value)} /></label>{error&&<p className="portal-error">{error}</p>}{message&&<p className="portal-success">{message}</p>}<button className="portal-primary">Atualizar senha</button></form></div></main>}
