@@ -4,6 +4,7 @@ export type PortalModule = 'overview' | 'colaboradores' | 'onboarding' | 'clima'
 export type Collaborator = { id: string; name: string; role: string; area: string; onboarding: number }
 export type Notice = { id: string; title: string; text: string; date: string }
 export type DevelopmentItem = { id: string; collaborator: string; type: string; text: string; progress: number }
+export type PortalData = { collaborators: Collaborator[]; notices: Notice[]; development: DevelopmentItem[]; onboarding: Array<{ id: string; collaborator_id: string; etapa: string; concluida: boolean }>; climate: Array<{ id: string; nota_1: number; nota_2: number; nota_3: number; data_resposta: string }>; documents: Array<{ id: string; title: string; storage_path: string; date: string }>; companyId: string }
 
 export const portalClient = { company: 'Horizonte Tecnologia', contact: 'Mariana Costa', plan: 'Evolução' as Plan }
 
