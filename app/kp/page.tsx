@@ -10,7 +10,7 @@ export default async function Kp() {
   if (profile?.papel !== 'consultora') redirect('/area-do-cliente')
   const [{ data: contacts }, { data: companies }] = await Promise.all([
     supabase.from('site_contatos').select('id,nome,empresa,email,telefone,status,created_at').order('created_at', { ascending: false }),
-    supabase.from('empresas').select('id,nome,plano,ativa').order('nome'),
+    supabase.from('empresas').select('id,nome,plano,ativa,created_at').order('nome'),
   ])
   const companyList = companies || []
   const indicators = await Promise.all(companyList.map(async company => {
@@ -21,5 +21,6 @@ export default async function Kp() {
     ])
     return { id: company.id, nome: company.nome, plano: company.plano, colaboradores: colaboradores || 0, comunicados: comunicados || 0, avaliacoes: avaliacoes || 0 }
   }))
-  return <KpDashboard initialContacts={contacts || []} initialCompanies={companyList} indicators={indicators} />
+  const companiesWithCounts = companyList.map(company => ({ ...company, colaboradores: indicators.find(item => item.id === company.id)?.colaboradores || 0 }))
+  return <KpDashboard initialContacts={contacts || []} initialCompanies={companiesWithCounts} indicators={indicators} />
 }
