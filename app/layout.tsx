@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from 'next'
 import './globals.css'
 import './client-portal.css'
 import { companyName, metadataDescription } from '@/lib/site-data'
+import AuthLinkRedirect from '@/components/client/AuthLinkRedirect'
 
 export const metadata: Metadata = {
   title: { default: 'Kairós Gestão e Liderança | RH para pequenas empresas em Alfenas e Sul de Minas', template: `%s | ${companyName}` },
@@ -17,5 +18,5 @@ export const metadata: Metadata = {
 export const viewport: Viewport = { colorScheme: 'light', themeColor: '#16283C', width: 'device-width', initialScale: 1 }
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <html lang="pt-BR" className="bg-soft"><body className="antialiased">{children}{process.env.NODE_ENV === 'production' && <Analytics />}</body></html>
+  return <html lang="pt-BR" className="bg-soft"><body className="antialiased"><AuthLinkRedirect />{children}{process.env.NODE_ENV === 'production' && <Analytics />}</body></html>
 }
