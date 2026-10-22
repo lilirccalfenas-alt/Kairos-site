@@ -19,13 +19,14 @@ export async function POST(request: Request) {
   if (!context) return NextResponse.json({ error: 'Não autorizado' }, { status: 403 })
   const { user, admin } = context
   const body = await request.json()
+  const redirectTo = `${process.env.NEXT_PUBLIC_SITE_URL || new URL(request.url).origin}/area-do-cliente/definir-senha`
   try {
     if (body.action === 'create_client') {
       const nome = String(body.nome || '').trim(); const plano = String(body.plano || '').trim(); const responsavel = String(body.responsavel || '').trim(); const email = String(body.email || '').trim().toLowerCase()
       if (!nome || !responsavel || !email || !['essencial', 'evolucao', 'transformacao'].includes(plano)) return NextResponse.json({ error: 'Preencha empresa, plano, responsável e e-mail.' }, { status: 400 })
       const { data: company, error: companyError } = await admin.from('empresas').insert({ nome, plano, ativa: true }).select('id,nome,plano,ativa,created_at').single()
       if (companyError) throw companyError
-      const { data: invited, error: inviteError } = await admin.auth.admin.inviteUserByEmail(email, { data: { nome: responsavel } })
+      const { data: invited, error: inviteError } = await admin.auth.admin.inviteUserByEmail(email, { data: { nome: responsavel }, redirectTo })
       if (inviteError || !invited.user) { await admin.from('empresas').delete().eq('id', company.id); throw inviteError || new Error('Convite não enviado') }
       const { error: profileError } = await admin.from('perfis').insert({ id: invited.user.id, empresa_id: company.id, papel: 'cliente', nome: responsavel })
       if (profileError) { await admin.auth.admin.deleteUser(invited.user.id); await admin.from('empresas').delete().eq('id', company.id); throw profileError }
@@ -46,7 +47,7 @@ export async function POST(request: Request) {
       if (!profile) throw new Error('Nenhum usuário cliente encontrado para esta empresa.')
       const { data: authUser } = await admin.auth.admin.getUserById(profile.id)
       if (!authUser.user?.email) throw new Error('O usuário não possui e-mail.')
-      const { error } = await admin.auth.admin.inviteUserByEmail(authUser.user.email, { data: { nome: profile.nome } })
+      const { error } = await (await createClient()).auth.resetPasswordForEmail(authUser.user.email, { redirectTo })
       if (error) throw error
       await audit(admin, user.id, body.action === 'reset_access' ? 'acesso_redefinido' : 'convite_enviado', body.empresa_id, profile.id, { email: authUser.user.email })
       return NextResponse.json({ data: { message: body.action === 'reset_access' ? 'E-mail para redefinição de acesso enviado.' : 'Convite reenviado.' } })
