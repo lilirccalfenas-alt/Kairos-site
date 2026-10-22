@@ -19,7 +19,7 @@ export async function POST(request: Request) {
   if (!context) return NextResponse.json({ error: 'Não autorizado' }, { status: 403 })
   const { user, admin } = context
   const body = await request.json()
-  const redirectTo = `${process.env.NEXT_PUBLIC_SITE_URL || new URL(request.url).origin}/area-do-cliente/definir-senha`
+  const redirectTo = 'https://kairosrhgestao.com.br/area-do-cliente/definir-senha'
   try {
     if (body.action === 'create_client') {
       const nome = String(body.nome || '').trim(); const plano = String(body.plano || '').trim(); const responsavel = String(body.responsavel || '').trim(); const email = String(body.email || '').trim().toLowerCase()

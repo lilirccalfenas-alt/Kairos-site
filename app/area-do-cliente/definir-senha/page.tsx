@@ -72,7 +72,7 @@ function DefinePasswordForm() {
     setError('')
     setMessage('')
     if (!email) return setError('Informe o e-mail para receber um novo link.')
-    const { error: resetError } = await createClient().auth.resetPasswordForEmail(email, { redirectTo: `${window.location.origin}/area-do-cliente/definir-senha` })
+    const { error: resetError } = await createClient().auth.resetPasswordForEmail(email, { redirectTo: 'https://kairosrhgestao.com.br/area-do-cliente/definir-senha' })
     if (resetError) return setError('Não foi possível enviar o novo link. Tente novamente.')
     setMessage('Se o e-mail estiver cadastrado, enviaremos um novo link.')
   }
