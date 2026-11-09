@@ -62,7 +62,8 @@ export default function FormAnuncio() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(Object.fromEntries(new FormData(form))),
       })
-      if (!response.ok) throw new Error('Não foi possível enviar a vaga. Tente novamente.')
+      const result = await response.json().catch(() => ({}))
+      if (!response.ok) throw new Error(result.error || 'Não foi possível enviar a vaga. Tente novamente.')
       setStatus('success')
       setMissing([])
     } catch (submissionError) {
