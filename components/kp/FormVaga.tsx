@@ -19,11 +19,32 @@ export default function FormVaga({ id, titulo, empresa, blocos }: any) {
 
   async function enviar() {
     setBusy(true);
-    const x = await fetch("/api/kp/candidatar", { method: "POST", body: JSON.stringify({ vaga: id, ...f, lgpd, banco, r }) });
-    setBusy(false);
-    if (x.ok) return setFim(true);
-    const { erro } = await x.json().catch(() => ({ erro: "" }));
-    setMsg(erro === "ja_candidatou" ? "Já existe uma inscrição com este e-mail." : erro === "encerrada" ? "A vaga foi encerrada." : "Não foi possível enviar. Tente novamente.");
+    setMsg("");
+    try {
+      const response = await fetch("/api/kp/candidatar", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ vaga: id, ...f, lgpd, banco, r }),
+      });
+      const result = await response.json().catch(() => ({}));
+      if (response.ok) {
+        setFim(true);
+        return;
+      }
+      setMsg(
+        result.erro === "ja_candidatou"
+          ? "Já existe uma inscrição com este e-mail."
+          : result.erro === "encerrada"
+            ? "A vaga foi encerrada e não recebe novas inscrições."
+            : result.erro === "dados" || result.erro === "respostas"
+              ? "Revise seus dados e confirme todas as respostas antes de enviar."
+              : "Não foi possível concluir o envio agora. Seus dados não foram confirmados. Aguarde alguns minutos e tente novamente; se o problema continuar, entre em contato com a empresa."
+      );
+    } catch {
+      setMsg("Falha de conexão ao enviar. Confira sua internet e tente novamente. Se continuar, entre em contato com a empresa.");
+    } finally {
+      setBusy(false);
+    }
   }
   return (
     <div style={{ fontFamily: "system-ui, sans-serif", background: "#f5f3ee", minHeight: "100vh", color: C.navy }}>
@@ -47,7 +68,7 @@ export default function FormVaga({ id, titulo, empresa, blocos }: any) {
           </div>
         ) : step >= blocos.length ? (
           <div style={card}><h3>Pronto para enviar</h3><p>Confira se está tudo certo. Depois de enviar, não é possível alterar.</p>
-            {msg && <p style={{ color: "#9b2c2c" }}>{msg}</p>}
+            {msg && <p role="alert" aria-live="assertive" style={{ color: "#9b2c2c" }}>{msg}</p>}
             <div style={{ display: "flex", justifyContent: "space-between" }}><button style={btn()} onClick={() => setStep(step - 1)}>Voltar</button><button style={btn(true)} disabled={busy} onClick={enviar}>{busy ? "Enviando..." : "Enviar inscrição"}</button></div></div>
         ) : (
           <div style={card}>
