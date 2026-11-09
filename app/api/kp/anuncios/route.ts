@@ -5,7 +5,7 @@ import { db } from '@/lib/kp/db'
 const DEFAULT_PESOS = { com: 2, eq: 2, resp: 2, prob: 2, adap: 2, cli: 2 }
 
 export async function POST(req: Request) {
-  const requestId = randomUUID()
+  const ref = randomUUID()
   try {
     const b = await req.json()
     if (b.website) return NextResponse.json({ error: 'Não foi possível enviar.' }, { status: 400 })
@@ -29,12 +29,20 @@ export async function POST(req: Request) {
       contato: { cnpj: b.cnpj || '', responsavel: b.responsavel, email: b.email, telefone: b.telefone, faixa: b.faixa || '' },
     })
     if (error) {
-      console.error('[kp/anuncios] insert failed', { requestId, code: error.code, message: error.message, details: error.details, hint: error.hint })
-      return NextResponse.json({ error: `Não foi possível registrar o anúncio. Informe esta referência à Kairós: ${requestId}.` }, { status: 500 })
+      console.error('[kp_vagas]', ref, {
+        message: error.message,
+        code: error.code,
+        details: error.details,
+        hint: error.hint,
+      })
+      return NextResponse.json(
+        { error: `Não foi possível registrar o anúncio. Informe esta referência à Kairós: ${ref}` },
+        { status: 400 }
+      )
     }
     return NextResponse.json({ ok: true })
   } catch (error) {
-    console.error('[kp/anuncios] request failed', { requestId, message: error instanceof Error ? error.message : 'unknown error' })
-    return NextResponse.json({ error: `Não foi possível registrar o anúncio. Informe esta referência à Kairós: ${requestId}.` }, { status: 500 })
+    console.error('[kp/anuncios] request failed', { ref, message: error instanceof Error ? error.message : 'unknown error' })
+    return NextResponse.json({ error: `Não foi possível registrar o anúncio. Informe esta referência à Kairós: ${ref}` }, { status: 500 })
   }
 }
